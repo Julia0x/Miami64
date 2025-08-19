@@ -1,4 +1,18 @@
 {
+  "name": "miami-whatsapp-bot",
+  "version": "1.0.0",
+  "description": "Miami - Intelligent WhatsApp AI Bot with advanced tool capabilities",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node src/main.js",
+    "dev": "node src/main.js",
+    "restart": "pkill -f 'node src/main.js' && node src/main.js",
+    "stop": "pkill -f 'node src/main.js'",
+    "logs": "tail -f logs/app.log"
+  },
+  "keywords": ["whatsapp", "bot", "ai", "gemini", "baileys"],
+  "author": "Miami Bot",
+  "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@whiskeysockets/baileys": "^6.7.18",
