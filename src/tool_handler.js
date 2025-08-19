@@ -191,23 +191,25 @@ async function getMessageStats() {
 // New Tool Implementation
 async function deleteLastMessage() {
     if (!lastSentMessageKey) {
-        const errorMsg = "Tool Error: There's no recent message sent by me to delete.";
+        const errorMsg = "Oops! 😅 I don't have a recent message to delete. But no worries - next time you want me to undo something, just let me know right after I send it! 💪";
         logger.error(errorMsg);
         return JSON.stringify({ status: "Error", reason: errorMsg });
     }
+    
     if (!sockInstance) {
-        const errorMsg = "Tool Error: My connection to WhatsApp is down.";
+        const errorMsg = "Oh no! 😰 My WhatsApp connection is down, so I can't delete the message right now. Let me try to reconnect! 🔄";
         logger.error(errorMsg);
         return JSON.stringify({ status: "Error", reason: errorMsg });
     }
+    
     try {
         await sockInstance.sendMessage(lastSentMessageKey.remoteJid, { delete: lastSentMessageKey });
         logger.info(`SUCCESS: Deleted message with key: ${lastSentMessageKey.id}`);
-        const successMsg = "Successfully deleted my last message.";
-        lastSentMessageKey = null; // Clear the key after deleting
+        const successMsg = "Done! ✨ Message deleted successfully! Don't worry, we all make mistakes sometimes! 😊💕";
+        lastSentMessageKey = null;
         return JSON.stringify({ status: "Success", detail: successMsg });
     } catch (error) {
-        const errorMsg = `Tool Error: I failed to delete the message. Error: ${error.message}`;
+        const errorMsg = `Hmm, I had trouble deleting that message 😔 It might be too old or there could be a connection issue. Error: ${error.message}`;
         logger.error(errorMsg);
         return JSON.stringify({ status: "Error", reason: errorMsg });
     }
