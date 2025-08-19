@@ -8,9 +8,10 @@ Miami is a sophisticated WhatsApp AI bot powered by Google's Gemini AI, featurin
 
 ### 🧠 **Intelligent AI Behavior**
 - **Smart Tool Selection**: AI automatically chooses the right tool based on context
-- **Natural Sinhala Interaction**: Conversations feel natural and authentic
+- **Natural English Interaction**: Conversations feel authentic with real emotions  
 - **Context Awareness**: Remembers conversation history and user intent
 - **Proactive Suggestions**: AI suggests better approaches when needed
+- **Emotional Intelligence**: Responds with genuine feelings and empathy
 
 ### 🛠️ **Comprehensive Tool Suite (7 Tools)**
 
