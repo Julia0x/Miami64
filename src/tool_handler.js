@@ -242,8 +242,8 @@ async function executeTool(functionCall, senderNumber) {
     logger.info(`Executing tool '${functionName}' for owner with args: ${JSON.stringify(functionArgs)}`); 
     
     if (functionName === 'sendWhatsAppMessage') return await sendWhatsAppMessage(functionArgs); 
-    if (functionName === 'getConversationSummary') return await getConversationSummary(functionArgs); 
-    if (functionName === 'listActiveChats') return await listActiveChats(functionArgs); 
+    if (functionName === 'getConversationSummary') return await getConversationSummary(functionArgs, senderNumber); 
+    if (functionName === 'listActiveChats') return await listActiveChats(functionArgs, senderNumber); 
     if (functionName === 'deleteLastMessage') return await deleteLastMessage(functionArgs); 
     if (functionName === 'sendToMultiple') return await sendToMultiple(functionArgs); 
     if (functionName === 'formatMessage') return await formatMessage(functionArgs); 
