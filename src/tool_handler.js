@@ -50,20 +50,27 @@ async function sendWhatsAppMessage({ number, message }) {
         return JSON.stringify({ status: "Error", reason: errorMsg }); 
     } 
 }
-async function getConversationSummary({ number }) { 
+async function getConversationSummary({ number }, senderNumber) { 
     const formattedNumber = formatPhoneNumber(number); 
     if (!formattedNumber) { 
         return JSON.stringify({ isFinal: true, content: `Hmm, the number '${number}' doesn't look quite right 🤔 Could you check the format? I want to make sure I'm looking up the right person! 📞` }); 
     } 
     
-    const fullHistory = await readFullHistory(); 
-    const userJid = `${formattedNumber}@s.whatsapp.net`; 
+    const requestingUserId = `${senderNumber}@s.whatsapp.net`;
+    const targetUserId = `${formattedNumber}@s.whatsapp.net`;
     
-    if (!fullHistory[userJid] || fullHistory[userJid].length === 0) { 
+    // Privacy check using the new privacy-protected function
+    const history = await getPrivacyFilteredHistory(requestingUserId, targetUserId);
+    
+    if (history === null) {
+        return JSON.stringify({ isFinal: true, content: `I keep all conversations private! 🤐💕 I can't share details about other people's chats. But I'd be happy to send them a message for you instead! What would you like me to say? 😊` });
+    }
+    
+    if (!history || history.length === 0) { 
         return JSON.stringify({ isFinal: true, content: `Oh! 😮 I haven't had any conversations with ${formattedNumber} yet. Want me to send them a message to start one? I'd love to help you connect! 💬✨` }); 
     } 
     
-    const conversationText = fullHistory[userJid].map(msg => `${msg.role === 'user' ? 'They said' : 'I said'}: ${msg.content}`).join('\n'); 
+    const conversationText = history.map(msg => `${msg.role === 'user' ? 'They said' : 'I said'}: ${msg.content}`).join('\n'); 
     const summaryPrompt = `Please provide a warm, friendly summary of my conversation with ${formattedNumber}. Make it personal and engaging:\n\n${conversationText}`; 
     
     return JSON.stringify({ needsSummarization: true, prompt: summaryPrompt }); 
