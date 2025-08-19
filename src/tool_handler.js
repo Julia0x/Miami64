@@ -21,6 +21,112 @@ async function sendWhatsAppMessage({ number, message }) { if (!number || !messag
 async function getConversationSummary({ number }) { const formattedNumber = formatPhoneNumber(number); if (!formattedNumber) { return JSON.stringify({ isFinal: true, content: `සොරි මචං, '${number}' කියන නම්බර් එකේ format එක අවුල් වගේ.` }); } const fullHistory = await readFullHistory(); const userJid = `${formattedNumber}@s.whatsapp.net`; if (!fullHistory[userJid] || fullHistory[userJid].length === 0) { return JSON.stringify({ isFinal: true, content: "මම එයත් එක්ක තාම කතා කරලා නෑ මචං." }); } const conversationText = fullHistory[userJid].map(msg => `${msg.role === 'user' ? 'They said' : 'I said'}: ${msg.content}`).join('\n'); const summaryPrompt = `From my perspective as Miami, briefly summarize the conversation I had with ${formattedNumber} in a casual Sinhala tone:\n\n${conversationText}`; return JSON.stringify({ needsSummarization: true, prompt: summaryPrompt }); }
 async function listActiveChats() { const fullHistory = await readFullHistory(); const chatJids = Object.keys(fullHistory); if (chatJids.length <= 1) { return JSON.stringify({ content: "මම දැනට ඔයා එක්ක විතරයි මචං කතා කරන්නේ.", isFinal: true }); } const numbers = chatJids.map(jid => jid.split('@')[0]).filter(num => num !== config.ownerNumber); const responseText = `ඔයා ඇරුනම මම දැනට කතා කරමින් ඉන්න අය:\n- ${numbers.join('\n- ')}`; return JSON.stringify({ content: responseText, isFinal: true }); }
 
+// New Advanced Tools
+async function sendToMultiple({ numbers, message }) {
+    if (!numbers || !message) {
+        return JSON.stringify({ status: "Error", reason: "Tool Error: I need both numbers list and message content." });
+    }
+    
+    if (!sockInstance) {
+        return JSON.stringify({ status: "Error", reason: "Tool Error: WhatsApp connection is down." });
+    }
+    
+    const numbersList = Array.isArray(numbers) ? numbers : numbers.split(',').map(n => n.trim());
+    const results = [];
+    let successCount = 0;
+    
+    for (const number of numbersList) {
+        const formattedNumber = formatPhoneNumber(number);
+        if (!formattedNumber) {
+            results.push(`❌ ${number}: Invalid format`);
+            continue;
+        }
+        
+        try {
+            const jid = `${formattedNumber}@s.whatsapp.net`;
+            await sockInstance.sendMessage(jid, { text: message });
+            await addAuthorizedUser(formattedNumber);
+            results.push(`✅ ${formattedNumber}: Sent`);
+            successCount++;
+            
+            // Small delay between messages to avoid spam detection
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        } catch (error) {
+            results.push(`❌ ${formattedNumber}: Failed - ${error.message}`);
+        }
+    }
+    
+    const summary = `හරි මචං! ${successCount}/${numbersList.length} messages sent successfully:\n${results.join('\n')}`;
+    logger.info(`Bulk message sent: ${successCount}/${numbersList.length} successful`);
+    return JSON.stringify({ status: "Success", detail: summary });
+}
+
+async function formatMessage({ message, style }) {
+    if (!message) {
+        return JSON.stringify({ status: "Error", reason: "Tool Error: Message content is required." });
+    }
+    
+    let formattedMessage = message;
+    
+    switch (style?.toLowerCase()) {
+        case 'bold':
+            formattedMessage = `*${message}*`;
+            break;
+        case 'italic':
+            formattedMessage = `_${message}_`;
+            break;
+        case 'code':
+            formattedMessage = `\`\`\`${message}\`\`\``;
+            break;
+        case 'strikethrough':
+            formattedMessage = `~${message}~`;
+            break;
+        case 'fancy':
+            formattedMessage = `✨ ${message} ✨`;
+            break;
+        case 'important':
+            formattedMessage = `🚨 *${message}* 🚨`;
+            break;
+        case 'celebration':
+            formattedMessage = `🎉🎊 ${message} 🎊🎉`;
+            break;
+        default:
+            formattedMessage = `📝 ${message}`;
+    }
+    
+    return JSON.stringify({ 
+        status: "Success", 
+        detail: `Formatted message ready: ${formattedMessage}`,
+        formattedText: formattedMessage
+    });
+}
+
+async function getMessageStats() {
+    const fullHistory = await readFullHistory();
+    const chatJids = Object.keys(fullHistory);
+    const totalUsers = chatJids.length;
+    
+    let totalMessages = 0;
+    let myMessages = 0;
+    let userMessages = 0;
+    
+    chatJids.forEach(jid => {
+        const history = fullHistory[jid];
+        totalMessages += history.length;
+        myMessages += history.filter(msg => msg.role === 'assistant').length;
+        userMessages += history.filter(msg => msg.role === 'user').length;
+    });
+    
+    const stats = `📊 *Miami Bot Statistics:*
+👥 Total Users: ${totalUsers}
+💬 Total Messages: ${totalMessages}
+🤖 My Messages: ${myMessages}
+👤 User Messages: ${userMessages}
+📈 Average per user: ${Math.round(totalMessages/totalUsers)} messages`;
+    
+    return JSON.stringify({ content: stats, isFinal: true });
+}
+
 // New Tool Implementation
 async function deleteLastMessage() {
     if (!lastSentMessageKey) {
