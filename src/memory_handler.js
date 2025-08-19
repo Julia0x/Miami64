@@ -114,6 +114,14 @@ async function getAnonymizedStats() {
         userMessages += history.filter(msg => msg.role === 'user').length;
     });
     
+    return {
+        totalUsers,
+        totalMessages,
+        myMessages,
+        userMessages
+    };
+}
+
 module.exports = {
     getAuthorizedUsers,
     addAuthorizedUser,
