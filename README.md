@@ -80,38 +80,38 @@ npm run clear-session
 
 1. **Single Message:**
    ```
-   Send: "0771234567 කට 'Hello' යවන්න"
+   Send: "Send 'Hello there!' to +1234567890"
    Result: ✅ Uses sendWhatsAppMessage tool automatically
    ```
 
 2. **Bulk Messaging:**
    ```
-   Send: "0771111111,0772222222 කට 'Meeting today' යවන්න"  
+   Send: "Send 'Meeting today at 3PM' to +1234567890,+1987654321"  
    Result: ✅ Detects multiple numbers, uses sendToMultiple tool
    ```
 
 3. **Message Formatting:**
    ```
-   Send: "'URGENT UPDATE' කියලා bold කරලා format කරන්න"
+   Send: "Format 'URGENT UPDATE' in bold"
    Result: ✅ Uses formatMessage tool with bold styling
    ```
 
 4. **Delete/Undo:**
    ```
-   Send: "අන්තිම message එක delete කරන්න"
+   Send: "Delete that last message" or "Undo that"
    Result: ✅ Uses deleteLastMessage tool immediately
    ```
 
 5. **Statistics:**
    ```
-   Send: "මට bot stats පෙන්නන්න"
+   Send: "Show me the bot stats"
    Result: ✅ Uses getMessageStats tool, shows comprehensive data
    ```
 
 6. **Smart Parameter Collection:**
    ```
-   Send: "message එකක් යවන්න" (without details)
-   Result: ✅ AI asks "කාට message එක යවන්නද?" in natural Sinhala
+   Send: "Send a message" (without details)
+   Result: ✅ AI asks "Who should I send it to?" in natural English
    ```
 
 ## 📊 **Performance Metrics**
