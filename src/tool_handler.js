@@ -1,5 +1,5 @@
 const logger = require('./logger');
-const { addAuthorizedUser, readFullHistory } = require('./memory_handler');
+const { addAuthorizedUser, readFullHistory, getPrivacyFilteredHistory, getAnonymizedStats } = require('./memory_handler');
 const config = require('../config.json');
 
 let sockInstance = null;
