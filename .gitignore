@@ -1,0 +1,11 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Session data
+data/session.json
+
+# Log files
+logs/
