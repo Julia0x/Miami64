@@ -68,7 +68,19 @@ async function getConversationSummary({ number }) {
     
     return JSON.stringify({ needsSummarization: true, prompt: summaryPrompt }); 
 }
-async function listActiveChats() { const fullHistory = await readFullHistory(); const chatJids = Object.keys(fullHistory); if (chatJids.length <= 1) { return JSON.stringify({ content: "මම දැනට ඔයා එක්ක විතරයි මචං කතා කරන්නේ.", isFinal: true }); } const numbers = chatJids.map(jid => jid.split('@')[0]).filter(num => num !== config.ownerNumber); const responseText = `ඔයා ඇරුනම මම දැනට කතා කරමින් ඉන්න අය:\n- ${numbers.join('\n- ')}`; return JSON.stringify({ content: responseText, isFinal: true }); }
+async function listActiveChats() { 
+    const fullHistory = await readFullHistory(); 
+    const chatJids = Object.keys(fullHistory); 
+    
+    if (chatJids.length <= 1) { 
+        return JSON.stringify({ content: "Right now it's just you and me chatting! 😊 Want me to send a message to someone to start a new conversation? I love helping you stay connected! 💕", isFinal: true }); 
+    } 
+    
+    const numbers = chatJids.map(jid => jid.split('@')[0]).filter(num => num !== config.ownerNumber); 
+    const responseText = `Look at our little social network! 🌐✨ I've been chatting with:\n- ${numbers.join('\n- ')}\n\nWant me to send a message to any of them? I'm always ready to help! 💬💕`; 
+    
+    return JSON.stringify({ content: responseText, isFinal: true }); 
+}
 
 // New Advanced Tools
 async function sendToMultiple({ numbers, message }) {
