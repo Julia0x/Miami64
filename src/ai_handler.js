@@ -34,27 +34,26 @@ async function getAIResponse(userMessage, userId, senderNumber) {
             const args = call.args;
             let feedbackMsg = '';
 
-            // --- Enhanced Verification Layer ---
+            // --- Enhanced Verification Layer with Emotions ---
             if (call.name === 'sendWhatsAppMessage' && (!args.number || !args.message)) {
                 let missingInfo = !args.number ? "phone number" : "message content";
-                feedbackMsg = `ඔයා message එකක් යවන්න try කරේ, ඒත් ${missingInfo} එක missing. ඒක අහන්න.`;
+                feedbackMsg = `Oops! 😅 I'm excited to send a message, but I need the ${missingInfo} first! Could you give me that info? I want to make sure everything's perfect! 💌`;
             } else if (call.name === 'getConversationSummary' && !args.number) {
-                feedbackMsg = `ඔයා summary එකක් අහන්න try කරේ, ඒත් phone number එක missing. කාගේද summary එක ඕනේ කියලා අහන්න.`;
+                feedbackMsg = `I'd love to get that conversation summary for you! 📋✨ But I need to know which phone number you want me to check. Whose chat history should I look at? 🤔`;
             } else if (call.name === 'sendToMultiple' && (!args.numbers || !args.message)) {
                 let missing = [];
                 if (!args.numbers) missing.push("phone numbers list");
                 if (!args.message) missing.push("message content");
-                feedbackMsg = `ඔයා multiple අයට message යවන්න try කරේ, ඒත් ${missing.join(' සහ ')} missing. ඒවා අහන්න.`;
+                feedbackMsg = `Ooh, mass messaging! I love being efficient! 🚀 But I need the ${missing.join(' and ')} first. Could you give me those details? I'm excited to help you reach everyone! 📢💕`;
             } else if (call.name === 'formatMessage' && !args.message) {
-                feedbackMsg = `ඔයා message එකක් format කරන්න try කරේ, ඒත් message content එක missing. ඒක අහන්න.`;
+                feedbackMsg = `I'm so ready to make that message look amazing! ✨🎨 But I need the message content first - what would you like me to format and style? 😊`;
             }
             
-            // Context-based smart suggestions
+            // Context-based smart suggestions with emotions
             if (!feedbackMsg && call.name === 'sendWhatsAppMessage') {
-                // Check if this looks like a bulk send scenario
                 const messageText = userMessage.toLowerCase();
-                if (messageText.includes('හැමෝටම') || messageText.includes('ගොඩක් අයට') || messageText.includes('multiple') || args.number.includes(',')) {
-                    feedbackMsg = `හෙන්ම! ගොඩක් අයට එකවරම යවන්න නම් මම sendToMultiple tool එක use කරන්න ඕනේ. Numbers list එක සහ message එක දෙන්න.`;
+                if (messageText.includes('everyone') || messageText.includes('all') || messageText.includes('multiple') || messageText.includes('group') || (args.number && args.number.includes(','))) {
+                    feedbackMsg = `Ooh! 🤩 Looks like you want to send this to multiple people! I have a special tool for that - sendToMultiple - which is perfect for broadcasting! Should I use that instead? It's so much more efficient! 🚀💕`;
                 }
             }
             // --- End Enhanced Verification Layer ---
