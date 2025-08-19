@@ -50,7 +50,24 @@ async function sendWhatsAppMessage({ number, message }) {
         return JSON.stringify({ status: "Error", reason: errorMsg }); 
     } 
 }
-async function getConversationSummary({ number }) { const formattedNumber = formatPhoneNumber(number); if (!formattedNumber) { return JSON.stringify({ isFinal: true, content: `සොරි මචං, '${number}' කියන නම්බර් එකේ format එක අවුල් වගේ.` }); } const fullHistory = await readFullHistory(); const userJid = `${formattedNumber}@s.whatsapp.net`; if (!fullHistory[userJid] || fullHistory[userJid].length === 0) { return JSON.stringify({ isFinal: true, content: "මම එයත් එක්ක තාම කතා කරලා නෑ මචං." }); } const conversationText = fullHistory[userJid].map(msg => `${msg.role === 'user' ? 'They said' : 'I said'}: ${msg.content}`).join('\n'); const summaryPrompt = `From my perspective as Miami, briefly summarize the conversation I had with ${formattedNumber} in a casual Sinhala tone:\n\n${conversationText}`; return JSON.stringify({ needsSummarization: true, prompt: summaryPrompt }); }
+async function getConversationSummary({ number }) { 
+    const formattedNumber = formatPhoneNumber(number); 
+    if (!formattedNumber) { 
+        return JSON.stringify({ isFinal: true, content: `Hmm, the number '${number}' doesn't look quite right 🤔 Could you check the format? I want to make sure I'm looking up the right person! 📞` }); 
+    } 
+    
+    const fullHistory = await readFullHistory(); 
+    const userJid = `${formattedNumber}@s.whatsapp.net`; 
+    
+    if (!fullHistory[userJid] || fullHistory[userJid].length === 0) { 
+        return JSON.stringify({ isFinal: true, content: `Oh! 😮 I haven't had any conversations with ${formattedNumber} yet. Want me to send them a message to start one? I'd love to help you connect! 💬✨` }); 
+    } 
+    
+    const conversationText = fullHistory[userJid].map(msg => `${msg.role === 'user' ? 'They said' : 'I said'}: ${msg.content}`).join('\n'); 
+    const summaryPrompt = `Please provide a warm, friendly summary of my conversation with ${formattedNumber}. Make it personal and engaging:\n\n${conversationText}`; 
+    
+    return JSON.stringify({ needsSummarization: true, prompt: summaryPrompt }); 
+}
 async function listActiveChats() { const fullHistory = await readFullHistory(); const chatJids = Object.keys(fullHistory); if (chatJids.length <= 1) { return JSON.stringify({ content: "මම දැනට ඔයා එක්ක විතරයි මචං කතා කරන්නේ.", isFinal: true }); } const numbers = chatJids.map(jid => jid.split('@')[0]).filter(num => num !== config.ownerNumber); const responseText = `ඔයා ඇරුනම මම දැනට කතා කරමින් ඉන්න අය:\n- ${numbers.join('\n- ')}`; return JSON.stringify({ content: responseText, isFinal: true }); }
 
 // New Advanced Tools
