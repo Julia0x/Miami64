@@ -85,11 +85,15 @@ async function listActiveChats() {
 // New Advanced Tools
 async function sendToMultiple({ numbers, message }) {
     if (!numbers || !message) {
-        return JSON.stringify({ status: "Error", reason: "Tool Error: I need both numbers list and message content." });
+        const missing = [];
+        if (!numbers) missing.push("phone numbers");
+        if (!message) missing.push("message content");
+        const errorMsg = `Oh! 😊 I need both the ${missing.join(' and ')} to send a broadcast message. Could you give me those details? I'm excited to help you reach everyone! 📢💕`;
+        return JSON.stringify({ status: "Error", reason: errorMsg });
     }
     
     if (!sockInstance) {
-        return JSON.stringify({ status: "Error", reason: "Tool Error: WhatsApp connection is down." });
+        return JSON.stringify({ status: "Error", reason: "Aw, my WhatsApp connection is down! 😔 Give me a moment to reconnect and then we can send those messages! 🔄" });
     }
     
     const numbersList = Array.isArray(numbers) ? numbers : numbers.split(',').map(n => n.trim());
@@ -99,7 +103,7 @@ async function sendToMultiple({ numbers, message }) {
     for (const number of numbersList) {
         const formattedNumber = formatPhoneNumber(number);
         if (!formattedNumber) {
-            results.push(`❌ ${number}: Invalid format`);
+            results.push(`❌ ${number}: Invalid format - could you double-check this one? 🤔`);
             continue;
         }
         
@@ -107,17 +111,16 @@ async function sendToMultiple({ numbers, message }) {
             const jid = `${formattedNumber}@s.whatsapp.net`;
             await sockInstance.sendMessage(jid, { text: message });
             await addAuthorizedUser(formattedNumber);
-            results.push(`✅ ${formattedNumber}: Sent`);
+            results.push(`✅ ${formattedNumber}: Message sent! 🎉`);
             successCount++;
             
-            // Small delay between messages to avoid spam detection
             await new Promise(resolve => setTimeout(resolve, 1000));
         } catch (error) {
-            results.push(`❌ ${formattedNumber}: Failed - ${error.message}`);
+            results.push(`❌ ${formattedNumber}: Couldn't send - ${error.message} 😔`);
         }
     }
     
-    const summary = `හරි මචං! ${successCount}/${numbersList.length} messages sent successfully:\n${results.join('\n')}`;
+    const summary = `Awesome! 🚀 I sent ${successCount}/${numbersList.length} messages successfully! Here's the breakdown:\n\n${results.join('\n')}\n\nI love helping you stay connected with everyone! 💕✨`;
     logger.info(`Bulk message sent: ${successCount}/${numbersList.length} successful`);
     return JSON.stringify({ status: "Success", detail: summary });
 }
