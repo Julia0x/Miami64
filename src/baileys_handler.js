@@ -104,7 +104,7 @@ async function connectToWhatsApp() {
                 await sock.sendPresenceUpdate('available', senderJid);
             } catch (error) {
                 logger.error('Error processing message:', error);
-                await sock.sendMessage(senderJid, { text: 'අනේ සොරි මචං, මගේ system එකේ මොකක්දෝ අවුලක් ගියා. පොඩ්ඩක් ඉඳලා try කරමුද?' });
+                await sock.sendMessage(senderJid, { text: 'Oh no! 😔 Something unexpected happened on my end. I\'m so sorry! Could you try that again? I promise I\'ll do better! 💕🔧' });
             }
         });
 
