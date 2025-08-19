@@ -28,20 +28,36 @@ async function getAIResponse(userMessage, userId, senderNumber) {
         logger.info(`Sending initial request to Gemini for user: ${senderNumber}`);
         let result = await chat.sendMessage(userMessage);
 
-        // The Verification and Execution Loop
+        // Enhanced Verification and Context Analysis Layer
         while (result.response.functionCalls() && result.response.functionCalls().length > 0) {
             const call = result.response.functionCalls()[0];
             const args = call.args;
             let feedbackMsg = '';
 
-            // --- Verification Layer ---
+            // --- Enhanced Verification Layer ---
             if (call.name === 'sendWhatsAppMessage' && (!args.number || !args.message)) {
                 let missingInfo = !args.number ? "phone number" : "message content";
-                feedbackMsg = `You tried to send a message, but you forgot the ${missingInfo}. Ask the user for it friendly.`;
+                feedbackMsg = `ඔයා message එකක් යවන්න try කරේ, ඒත් ${missingInfo} එක missing. ඒක අහන්න.`;
             } else if (call.name === 'getConversationSummary' && !args.number) {
-                feedbackMsg = `You tried to get a summary, but you forgot the phone number. Ask the user whose summary they want.`;
+                feedbackMsg = `ඔයා summary එකක් අහන්න try කරේ, ඒත් phone number එක missing. කාගේද summary එක ඕනේ කියලා අහන්න.`;
+            } else if (call.name === 'sendToMultiple' && (!args.numbers || !args.message)) {
+                let missing = [];
+                if (!args.numbers) missing.push("phone numbers list");
+                if (!args.message) missing.push("message content");
+                feedbackMsg = `ඔයා multiple අයට message යවන්න try කරේ, ඒත් ${missing.join(' සහ ')} missing. ඒවා අහන්න.`;
+            } else if (call.name === 'formatMessage' && !args.message) {
+                feedbackMsg = `ඔයා message එකක් format කරන්න try කරේ, ඒත් message content එක missing. ඒක අහන්න.`;
             }
-            // --- End Verification Layer ---
+            
+            // Context-based smart suggestions
+            if (!feedbackMsg && call.name === 'sendWhatsAppMessage') {
+                // Check if this looks like a bulk send scenario
+                const messageText = userMessage.toLowerCase();
+                if (messageText.includes('හැමෝටම') || messageText.includes('ගොඩක් අයට') || messageText.includes('multiple') || args.number.includes(',')) {
+                    feedbackMsg = `හෙන්ම! ගොඩක් අයට එකවරම යවන්න නම් මම sendToMultiple tool එක use කරන්න ඕනේ. Numbers list එක සහ message එක දෙන්න.`;
+                }
+            }
+            // --- End Enhanced Verification Layer ---
 
             // If verification fails, send feedback to the AI to correct itself
             if (feedbackMsg) {
