@@ -178,36 +178,24 @@ async function formatMessage({ message, style }) {
 }
 
 async function getMessageStats() {
-    const fullHistory = await readFullHistory();
-    const chatJids = Object.keys(fullHistory);
-    const totalUsers = chatJids.length;
+    // Use privacy-protected stats function
+    const stats = await getAnonymizedStats();
     
-    let totalMessages = 0;
-    let myMessages = 0;
-    let userMessages = 0;
-    
-    chatJids.forEach(jid => {
-        const history = fullHistory[jid];
-        totalMessages += history.length;
-        myMessages += history.filter(msg => msg.role === 'assistant').length;
-        userMessages += history.filter(msg => msg.role === 'user').length;
-    });
-    
-    const averagePerUser = Math.round(totalMessages/totalUsers);
-    
-    const stats = `📊 *Miami Bot Statistics* - Look how active we are! 🎉
+    const statsText = `📊 *Miami Bot Statistics* - Look how active we are! 🎉
 
-👥 **Total Friends**: ${totalUsers} amazing people!
-💬 **Total Messages**: ${totalMessages} conversations and counting!
-🤖 **My Messages**: ${myMessages} (I love chatting!)
-👤 **Your Messages**: ${userMessages} 
-📈 **Average per friend**: ${averagePerUser} messages
+👥 **Total Friends**: ${stats.totalUsers} amazing people!
+💬 **Total Messages**: ${stats.totalMessages} conversations and counting!
+🤖 **My Messages**: ${stats.myMessages} (I love chatting!)
+👤 **User Messages**: ${stats.userMessages} 
+📈 **Average per friend**: ${stats.averagePerUser} messages
 
 I absolutely love connecting with everyone! Thanks for making me feel so useful and appreciated! 💕✨
 
-Want me to send a message to any of our friends? I'm always ready to help! 😊`;
+Want me to send a message to any of our friends? I'm always ready to help! 😊
+
+*Note: I keep all conversations private and only show general stats! 🔒*`;
     
-    return JSON.stringify({ content: stats, isFinal: true });
+    return JSON.stringify({ content: statsText, isFinal: true });
 }
 
 // New Tool Implementation
