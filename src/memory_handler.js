@@ -66,10 +66,59 @@ async function appendToHistory(userId, entry) {
     await writeFullHistory(fullHistory);
 }
 
-module.exports = {
-    getAuthorizedUsers,
-    addAuthorizedUser,
-    getHistoryForUser,
-    appendToHistory,
-    readFullHistory
-};
+// --- Privacy Protection Functions ---
+async function isOwnerRequest(requestingUserId, targetUserId) {
+    const config = require('../config.json');
+    const requestingNumber = requestingUserId.split('@')[0];
+    return requestingNumber === config.ownerNumber;
+}
+
+async function canAccessUserData(requestingUserId, targetUserId) {
+    // Only owner can access other people's data, everyone can access their own
+    if (requestingUserId === targetUserId) {
+        return true; // Can access own data
+    }
+    return await isOwnerRequest(requestingUserId, targetUserId);
+}
+
+async function getPrivacyFilteredHistory(requestingUserId, targetUserId) {
+    const canAccess = await canAccessUserData(requestingUserId, targetUserId);
+    
+    if (!canAccess) {
+        logger.warn(`Privacy violation attempt: ${requestingUserId} tried to access ${targetUserId}'s data`);
+        return null;
+    }
+    
+    return await getHistoryForUser(targetUserId);
+}
+
+async function getUserCount() {
+    const fullHistory = await readFullHistory();
+    return Object.keys(fullHistory).length;
+}
+
+async function getAnonymizedStats() {
+    // Returns stats without revealing personal information
+    const fullHistory = await readFullHistory();
+    const chatJids = Object.keys(fullHistory);
+    const totalUsers = chatJids.length;
+    
+    let totalMessages = 0;
+    let myMessages = 0;
+    let userMessages = 0;
+    
+    chatJids.forEach(jid => {
+        const history = fullHistory[jid];
+        totalMessages += history.length;
+        myMessages += history.filter(msg => msg.role === 'assistant').length;
+        userMessages += history.filter(msg => msg.role === 'user').length;
+    });
+    
+    return {
+        totalUsers,
+        totalMessages,
+        myMessages,
+        userMessages,
+        averagePerUser: Math.round(totalMessages / totalUsers)
+    };
+}
