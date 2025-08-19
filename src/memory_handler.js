@@ -114,11 +114,15 @@ async function getAnonymizedStats() {
         userMessages += history.filter(msg => msg.role === 'user').length;
     });
     
-    return {
-        totalUsers,
-        totalMessages,
-        myMessages,
-        userMessages,
-        averagePerUser: Math.round(totalMessages / totalUsers)
-    };
-}
+module.exports = {
+    getAuthorizedUsers,
+    addAuthorizedUser,
+    getHistoryForUser,
+    appendToHistory,
+    readFullHistory,
+    isOwnerRequest,
+    canAccessUserData,
+    getPrivacyFilteredHistory,
+    getUserCount,
+    getAnonymizedStats
+};
