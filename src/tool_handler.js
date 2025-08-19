@@ -127,7 +127,7 @@ async function sendToMultiple({ numbers, message }) {
 
 async function formatMessage({ message, style }) {
     if (!message) {
-        return JSON.stringify({ status: "Error", reason: "Tool Error: Message content is required." });
+        return JSON.stringify({ status: "Error", reason: "Ooh, I need the message content to format it! ✨ What would you like me to style? I'm excited to make it look amazing! 🎨" });
     }
     
     let formattedMessage = message;
@@ -160,7 +160,7 @@ async function formatMessage({ message, style }) {
     
     return JSON.stringify({ 
         status: "Success", 
-        detail: `Formatted message ready: ${formattedMessage}`,
+        detail: `Ta-da! ✨ Here's your beautifully formatted message: ${formattedMessage}\n\nLooks fantastic! Ready to send it? 😊💕`,
         formattedText: formattedMessage
     });
 }
@@ -181,12 +181,19 @@ async function getMessageStats() {
         userMessages += history.filter(msg => msg.role === 'user').length;
     });
     
-    const stats = `📊 *Miami Bot Statistics:*
-👥 Total Users: ${totalUsers}
-💬 Total Messages: ${totalMessages}
-🤖 My Messages: ${myMessages}
-👤 User Messages: ${userMessages}
-📈 Average per user: ${Math.round(totalMessages/totalUsers)} messages`;
+    const averagePerUser = Math.round(totalMessages/totalUsers);
+    
+    const stats = `📊 *Miami Bot Statistics* - Look how active we are! 🎉
+
+👥 **Total Friends**: ${totalUsers} amazing people!
+💬 **Total Messages**: ${totalMessages} conversations and counting!
+🤖 **My Messages**: ${myMessages} (I love chatting!)
+👤 **Your Messages**: ${userMessages} 
+📈 **Average per friend**: ${averagePerUser} messages
+
+I absolutely love connecting with everyone! Thanks for making me feel so useful and appreciated! 💕✨
+
+Want me to send a message to any of our friends? I'm always ready to help! 😊`;
     
     return JSON.stringify({ content: stats, isFinal: true });
 }
