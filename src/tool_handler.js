@@ -75,13 +75,18 @@ async function getConversationSummary({ number }, senderNumber) {
     
     return JSON.stringify({ needsSummarization: true, prompt: summaryPrompt }); 
 }
-async function listActiveChats() { 
+async function listActiveChats(args, senderNumber) { 
     const fullHistory = await readFullHistory(); 
     const chatJids = Object.keys(fullHistory); 
     
     if (chatJids.length <= 1) { 
         return JSON.stringify({ content: "Right now it's just you and me chatting! 😊 Want me to send a message to someone to start a new conversation? I love helping you stay connected! 💕", isFinal: true }); 
     } 
+    
+    // Privacy check - only owner can see full list, others see privacy message
+    if (senderNumber !== config.ownerNumber) {
+        return JSON.stringify({ content: "I keep all my conversations private! 🤐💕 But I'm always happy to send messages for you. Who would you like me to contact? 😊", isFinal: true });
+    }
     
     const numbers = chatJids.map(jid => jid.split('@')[0]).filter(num => num !== config.ownerNumber); 
     const responseText = `Look at our little social network! 🌐✨ I've been chatting with:\n- ${numbers.join('\n- ')}\n\nWant me to send a message to any of them? I'm always ready to help! 💬💕`; 
