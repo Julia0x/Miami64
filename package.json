@@ -6,9 +6,11 @@
   "scripts": {
     "start": "node src/main.js",
     "dev": "node src/main.js",
-    "restart": "pkill -f 'node src/main.js' && node src/main.js",
-    "stop": "pkill -f 'node src/main.js'",
-    "logs": "tail -f logs/app.log"
+    "restart": "node scripts/manage_bot.js restart",
+    "stop": "node scripts/manage_bot.js kill",
+    "clear-session": "node scripts/manage_bot.js clear-session",
+    "logs": "tail -f logs/app.log",
+    "status": "ps aux | grep 'node src/main.js' | grep -v grep || echo 'Bot is not running'"
   },
   "keywords": ["whatsapp", "bot", "ai", "gemini", "baileys"],
   "author": "Miami Bot",
