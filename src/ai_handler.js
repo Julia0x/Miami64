@@ -91,7 +91,7 @@ async function getAIResponse(userMessage, userId, senderNumber) {
 
     } catch (error) {
         logger.error('Error in getAIResponse:', error);
-        return "අඩෝ සොරි මචං, මගේ system එකේ මොකක්දෝ අවුලක් ගියා. පොඩ්ඩක් ඉඳලා try කරමුද?";
+        return "Oh no! 😰 Something went wrong in my system! I'm so sorry about that - give me a moment to get back on track, okay? Please try again in a bit! 💕🔧";
     }
 }
 
